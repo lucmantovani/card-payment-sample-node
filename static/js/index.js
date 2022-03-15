@@ -4,6 +4,20 @@ const mercadopago = new MercadoPago(mercadoPagoPublicKey);
 function loadCardForm() {
     const productCost = document.getElementById('amount').value;
     const productDescription = document.getElementById('product-description').innerText;
+    const payButton = document.getElementById("form-checkout__submit");
+    const validationErrorMessages= document.getElementById('validation-error-messages');
+
+    const fieldIdMapping = {
+        cardholderName: 'form-checkout__cardholderName',
+        cardholderEmail: 'form-checkout__cardholderEmail',
+        cardNumber: 'form-checkout__cardNumber',
+        expirationDate: 'form-checkout__cardExpirationDate',
+        CVV: 'form-checkout__securityCode',
+        installments: 'form-checkout__installments',
+        identificationType: 'form-checkout__identificationType',
+        identificationNumber: 'form-checkout__identificationNumber',
+        issuer: 'form-checkout__issuer'
+    };
 
     const cardForm = mercadopago.cardForm({
         amount: productCost,
@@ -120,7 +134,6 @@ function loadCardForm() {
             },
             onFetching: (resource) => {
                 console.log("Fetching resource: ", resource);
-                const payButton = document.getElementById("form-checkout__submit");
                 payButton.setAttribute('disabled', true);
                 return () => {
                     payButton.removeAttribute("disabled");
@@ -134,6 +147,32 @@ function loadCardForm() {
                 }
 
                 return token;
+            },
+            onValidityChange: (error, field) => {
+                const input = document.getElementById(fieldIdMapping[field]);
+                Array.from(validationErrorMessages.children).forEach(child => {
+                    const shouldRemoveChild = child.id.includes(field);
+                    if (shouldRemoveChild) {
+                        validationErrorMessages.removeChild(child);
+                    }
+                });
+                if (error) {
+                    input.classList.add('validation-error');
+                    error.forEach((e, index) => {
+                        const p = document.createElement('p');
+                        p.id = `${field}-${index}`;
+                        p.innerText = e.message;
+                        validationErrorMessages.appendChild(p);
+                    });
+                } else {
+                    input.classList.remove('validation-error');
+                }
+
+                if (validationErrorMessages.children.length > 0) {
+                    payButton.setAttribute('disabled', true);
+                } else {
+                    payButton.removeAttribute('disabled');
+                }
             }
         },
     });
