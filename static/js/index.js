@@ -12,7 +12,7 @@ function loadCardForm() {
         cardholderEmail: 'form-checkout__cardholderEmail',
         cardNumber: 'form-checkout__cardNumber',
         expirationDate: 'form-checkout__cardExpirationDate',
-        CVV: 'form-checkout__securityCode',
+        securityCode: 'form-checkout__securityCode',
         installments: 'form-checkout__installments',
         identificationType: 'form-checkout__identificationType',
         identificationNumber: 'form-checkout__identificationNumber',
